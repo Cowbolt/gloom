@@ -1,8 +1,11 @@
 #version 430 core
 
-out vec4 color;
+in layout(location=0) vec3 vertColor;
+
+out vec4 fragColor;
 
 void main()
 {
-    color = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+    # Outputs vec4 with RGBA args
+    color = fragColor;
 }

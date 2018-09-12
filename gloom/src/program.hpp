@@ -55,6 +55,6 @@ inline void printGLError() {
 }
 
 // Generate VAO consisting of triangles
-int genTriangleVAO(float* vertices, int* indices, int num_vertices, int num_indices);
+int genVAO(float* vertices, float* colors, int* indices, int num_vertices, int num_colors, int num_indices);
 
 #endif
