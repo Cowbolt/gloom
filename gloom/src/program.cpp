@@ -22,14 +22,55 @@ void runProgram(GLFWwindow* window)
     Gloom::Shader shader;
     shader.makeBasicShader("../gloom/shaders/simple.vert",
       "../gloom/shaders/simple.frag");
-    // float vertices [9*5] = {-0.9, -0.9, 0.f, -0.3, -0.9, 0.f, -0.6, -0.3, 0.f,
-    //                       -0.6, -0.6, 0.f, -0.f, -0.6, 0.f, 0.f, 0.f, 0.f};
-    //  int indices [9*5]    = { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17 };
 
-    float vertices [9] = { 0.6, -0.8, -1.2, 0.f, 0.4, 0.f, -0.8, -0.2, 1.2 };
-    int indices [9]    = { 0,1,2,3,4,5,6,7,8};
-    int num_elems      = 9;
-    // int vao_id        = genVAO(vertices, indices, num_elems, num_elems);
+    float vertices [3*3*5] = { 0.6, -0.8, 1.8, 0.f, 0.4, -0.f, -0.8, -0.2, -1.8,
+                             // -0.9, -0.9,  0.f, // 1
+                             // -0.3, -0.9,  0.f,
+                             // -0.6, -0.3,  0.f,
+                              -0.6, -0.6,  0.f, // 4
+                              -0.f, -0.6,  0.f,
+                               0.f,  0.f,  0.f,
+                              -0.6, -0.6,  0.f, // 7
+                              -0.f, -0.6,  0.f,
+                               0.f,  0.f,  0.f,
+                              -0.6, -0.6,  0.f, // 10
+                              -0.f, -0.6,  0.f,
+                               0.f,  0.f,  0.f,
+                               0.f,  0.f,  0.f};
+
+
+    float colors [4*3*5]   = {
+                               0.9,  0.9,  0.f,  1.0, // 1
+                               0.9,  0.f,  0.6,  1.0,
+                               0.f,  0.6,  0.6,  1.0,
+                               0.f,  0.6,  0.f,  1.0, // 4
+                               0.f,  0.f,  0.6,  1.0,
+                               0.f,  0.f,  0.6,  1.0,
+                               0.f,  0.f,  0.f,  1.0, // 7
+                               0.6,  0.f, -0.f,  1.0,
+                               0.f,  0.f,  0.f,  1.0,
+                               0.6,  0.6,  0.f,  1.0, // 10
+                               0.6,  0.f,  0.f,  1.0,
+                               0.6,  0.f,  0.f,  1.0,
+                               0.6,  0.f,  0.f,  1.0, // 13
+                               0.6,  0.f,  0.f,  1.0,
+                               0.6,  0.f,  0.f,  1.0};
+
+
+
+    int indices [3*5]    = { 0,  1,  2,  3,  4,  5,  6,  7, 8,
+                             9, 10, 11, 12, 13, 14};
+                            // , 16, 17,
+                            // 18, 19, 20, 21, 22, 23, 24, 25, 26,
+                            // 27, 28, 29, 30, 31, 32, 33, 34, 35,
+                            // 36, 37, 38, 39, 40, 41, 42, 43, 44};
+
+    int num_triangles = 5;
+    int num_verts     = num_triangles*3;
+    int num_coords    = num_verts*3;
+    int num_colors    = num_verts*4;
+
+    int vao_id        = genVAO(vertices, colors, indices, num_coords, num_colors, num_verts);
 
 
     // Rendering Loop
@@ -39,9 +80,9 @@ void runProgram(GLFWwindow* window)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Draw your scene here
-        // glBindVertexArray(vao_id);
+        glBindVertexArray(vao_id); // XXX: Needed?
         shader.activate();
-        // glDrawElements(GL_TRIANGLES, num_elems/3, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, num_verts, GL_UNSIGNED_INT, 0);
         shader.deactivate();
 
         // Handle other events
@@ -83,7 +124,7 @@ int genVAO(float* vertices, float* colors, int* indices,  int num_vertices, int 
    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * num_vertices, vertices, GL_STATIC_DRAW);
 
    // Takes index, size(num elems), enum type, bool normalised, stride, num bytes until start
-   glVertexAttribPointer(0, size_verts, GL_FLOAT, false, (size_verts+size_colors)*4, 0);
+   glVertexAttribPointer(0, size_verts, GL_FLOAT, false, size_verts*4, 0);
    glEnableVertexAttribArray(0);
 
    // Setup color VBO
@@ -93,8 +134,7 @@ int genVAO(float* vertices, float* colors, int* indices,  int num_vertices, int 
    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * num_colors, colors, GL_STATIC_DRAW);
 
    // Takes index, size(num elems), enum type, bool normalised, stride, num bytes until start
-   int offset = size_verts*4; // Reference operator requires a memregion to reference
-   glVertexAttribPointer(1, size_colors, GL_FLOAT, false, (size_verts+size_colors)*4, &offset);
+   glVertexAttribPointer(1, size_colors, GL_FLOAT, false, size_colors*4, 0);
    glEnableVertexAttribArray(1);
 
    // Setup index VBO
