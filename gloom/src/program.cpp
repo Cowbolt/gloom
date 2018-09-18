@@ -3,6 +3,12 @@
 #include "gloom/gloom.hpp"
 #include "gloom/shader.hpp"
 
+// Globals
+// Transformation variables
+glm::vec3 transVec = glm::vec3(0.0);
+glm::vec3 rotVec = glm::vec3(0.0);
+float rotX = 0.f;
+float rotY = 0.f;
 
 void runProgram(GLFWwindow* window)
 {
@@ -23,56 +29,48 @@ void runProgram(GLFWwindow* window)
     shader.makeBasicShader("../gloom/shaders/simple.vert",
       "../gloom/shaders/simple.frag");
 
-    float vertices [3*3*5] = {-0.9, -0.9,  0.f, // 0
-                              -0.3, -0.9,  0.f,
-                              -0.6, -0.3,  0.f,
+    float vertices [3*3*5] = {-0.6, -0.6, -1.f, // 0
+                               0.6, -0.6, -1.f,
+                               0.f,  0.6, -1.f,
+                               0.f,  0.0, -0.4};
+/*
+                               0.9, -0.9,  0.2, // 3
+                               0.9,  0.9,  0.2,
+                              -0.6,  0.f,  0.2,
 
-                              -0.9, -0.3,  0.f, // 3
-                              -0.3, -0.3,  0.f,
-                               0.6,  0.3,  0.f,
+                               0.9,  0.9,  0.1, // 6
+                              -0.9,  0.9,  0.1,
+                               0.f, -0.6,  0.1,
 
-                              -0.6, -0.6,  0.f, // 6
-                              -0.f, -0.6,  0.f,
-                               0.f,  0.f,  0.f,
-
-                              -0.6, -0.6,  0.f, // 9
-                              -0.f, -0.6,  0.f,
-                               0.f,  0.f,  0.f,
-
-                               0.f,  0.f,  0.f, // 12
-                               0.f,  0.f,  0.f,
-                               0.f,  0.f,  0.f};
-
+                              -0.9, -0.9,  0.0, // 9
+                               0.9, -0.9,  0.0,
+                               0.f,  0.6,  0.0};
+*/
 
     float colors [4*3*5]   = {
-                               0.9,  0.9,  0.f,  1.0, // 0
-                               0.9,  0.f,  0.6,  1.0,
-                               0.f,  0.6,  0.6,  1.0,
+                               1.f,  0.f,  1.f,  1.f, // 0
+                               1.f,  1.f,  1.f,  1.f,
+                               1.f,  1.f,  0.f,  1.f,
+                               0.f,  1.f,  1.f,  1.f};
+/*
+                               1.f,  0.f,  0.f,  0.5, // 3
+                               1.f,  0.f,  0.f,  0.5,
+                               1.f,  0.f,  0.f,  0.5,
 
-                               0.f,  0.6,  0.f,  1.0, // 3
-                               0.f,  0.f,  0.6,  1.0,
-                               0.f,  0.f,  0.6,  1.0,
+                               0.f,  0.f,  1.f,  0.5, // 6
+                               0.f,  0.f,  1.f,  0.5,
+                               0.f,  0.f,  1.f,  0.5,
 
-                               0.f,  0.f,  0.f,  1.0, // 6
-                               0.6,  0.f, -0.f,  1.0,
-                               0.f,  0.f,  0.f,  1.0,
-
-                               0.6,  0.6,  0.f,  1.0, // 9
-                               0.6,  0.f,  0.f,  1.0,
-                               0.6,  0.f,  0.f,  1.0,
-
-                               0.6,  0.f,  0.f,  1.0, // 12
-                               0.6,  0.f,  0.f,  1.0,
-                               0.6,  0.f,  0.f,  1.0};
+                               1.f,  1.f,  0.f,  0.5, // 9
+                               1.f,  1.f,  0.f,  0.5,
+                               1.f,  1.f,  0.f,  0.5};
+*/
 
 
-
-    int indices [3*5]    = { 0,  1,  2,  3,  4,  5,  6,  7, 8,
-                             9, 10, 11, 12, 13, 14};
-                            // , 16, 17,
-                            // 18, 19, 20, 21, 22, 23, 24, 25, 26,
-                            // 27, 28, 29, 30, 31, 32, 33, 34, 35,
-                            // 36, 37, 38, 39, 40, 41, 42, 43, 44};
+    int indices [3*5]    = { 0,  1,  2,
+                             2,  3,  0,
+                             3,  1,  0, 
+                             1,  3,  2};
 
     int num_triangles = 5;
     int num_verts     = num_triangles*3;
@@ -80,6 +78,8 @@ void runProgram(GLFWwindow* window)
     int num_colors    = num_verts*4;
 
     int vao_id        = genVAO(vertices, colors, indices, num_coords, num_colors, num_verts);
+
+    glm::mat4 matrix;
 
 
     // Rendering Loop
@@ -89,11 +89,21 @@ void runProgram(GLFWwindow* window)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Draw your scene here
-        glBindVertexArray(vao_id); // XXX: Needed?
         shader.activate();
+
+        // Perform transformations
+        // matrix = glm::mat4(1);
+        matrix = glm::perspective(60.f, 16.f/9.f, 1.f, 100.f);
+        matrix = matrix*glm::translate(transVec);
+        matrix = matrix*glm::rotate(rotX, glm::vec3(0.f,1.f,0.f));
+        matrix = matrix*glm::rotate(rotY, glm::vec3(1.f,0.f,0.f));
+
+
+        glUniformMatrix4fv(2, 1, false, (float*)(&matrix));
         glDrawElements(GL_TRIANGLES, num_verts, GL_UNSIGNED_INT, 0);
         shader.deactivate();
 
+        // counter += 0.01;
         // Handle other events
         glfwPollEvents();
         handleKeyboardInput(window);
@@ -111,6 +121,48 @@ void handleKeyboardInput(GLFWwindow* window)
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     {
         glfwSetWindowShouldClose(window, GL_TRUE);
+    }
+
+    // Translations
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+    {
+        transVec[2] -= 0.3;
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+    {
+        transVec[2] += 0.3;
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    {
+        transVec[0] += 0.1;
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    {
+        transVec[0] -= 0.1;
+    }
+
+    //Rotations
+    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+    {
+        rotX -= 0.01;
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+    {
+        rotX += 0.01;
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+    {
+        rotY -= 0.01;
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+    {
+        rotY += 0.01;
     }
 }
 
