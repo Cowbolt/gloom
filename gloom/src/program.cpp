@@ -29,10 +29,10 @@ void runProgram(GLFWwindow* window)
     shader.makeBasicShader("../gloom/shaders/simple.vert",
       "../gloom/shaders/simple.frag");
 
-    float vertices [3*3*5] = {-0.6, -0.6, -1.f, // 0
-                               0.6, -0.6, -1.f,
-                               0.f,  0.6, -1.f,
-                               0.f,  0.0, -0.4};
+    float vertices [3*3*5] = {-0.6, -0.6, -10.f, // 0
+                               0.6, -0.6, -10.f,
+                               0.f,  0.6, -10.f,};
+                              // 0.f,  0.0, -1.4};
 /*
                                0.9, -0.9,  0.2, // 3
                                0.9,  0.9,  0.2,
@@ -49,7 +49,7 @@ void runProgram(GLFWwindow* window)
 
     float colors [4*3*5]   = {
                                1.f,  0.f,  1.f,  1.f, // 0
-                               1.f,  1.f,  1.f,  1.f,
+                               //1.f,  1.f,  1.f,  1.f,
                                1.f,  1.f,  0.f,  1.f,
                                0.f,  1.f,  1.f,  1.f};
 /*
@@ -67,10 +67,10 @@ void runProgram(GLFWwindow* window)
 */
 
 
-    int indices [3*5]    = { 0,  1,  2,
-                             2,  3,  0,
-                             3,  1,  0, 
-                             1,  3,  2};
+    int indices [3*5]    = { 0,  1,  2};
+                             //2,  3,  0,
+                             //3,  1,  0, 
+                             //1,  3,  2};
 
     int num_triangles = 5;
     int num_verts     = num_triangles*3;
@@ -93,10 +93,10 @@ void runProgram(GLFWwindow* window)
 
         // Perform transformations
         // matrix = glm::mat4(1);
-        matrix = glm::perspective(60.f, 16.f/9.f, 1.f, 100.f);
+        matrix = glm::perspective(90.f, 1.f, 1.f, 100.f);
         matrix = matrix*glm::translate(transVec);
-        matrix = matrix*glm::rotate(rotX, glm::vec3(0.f,1.f,0.f));
-        matrix = matrix*glm::rotate(rotY, glm::vec3(1.f,0.f,0.f));
+        matrix = matrix*glm::rotate(rotX, glm::vec3(1.f,0.f,0.f));
+        matrix = matrix*glm::rotate(rotY, glm::vec3(0.f,1.f,0.f));
 
 
         glUniformMatrix4fv(2, 1, false, (float*)(&matrix));
