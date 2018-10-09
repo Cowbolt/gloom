@@ -2,6 +2,8 @@
 #define PROGRAM_HPP
 #pragma once
 
+// Local headers
+#include "mesh.hpp"
 
 // System headers
 #include <GLFW/glfw3.h>
@@ -61,6 +63,9 @@ inline void printGLError() {
 }
 
 // Generate VAO consisting of triangles
-int genVAO(float* vertices, float* colors, int* indices, int num_vertices, int num_colors, int num_indices);
+int genVAO(float* vertices, float* colors, unsigned int* indices, int num_vertices, int num_colors, int num_indices);
+
+int genVAOFromMesh(Mesh mesh);
+
 
 #endif
